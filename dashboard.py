@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from matplotlib.pyplot import annotate
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -147,14 +148,15 @@ with c2:
 
         if i == 0:  # Sora2
             text_pos = ["top center", "top center"]
+            annotate = "Sora2 Gap:"
         else:  # Veo3
             text_pos = ["bottom center", "bottom center"]
-
+            annotate = "Veo3.1 Gap:"
         fig_slope.add_trace(go.Scatter(
             x=['Subject', 'Action'], y=[subj[i], act[i]],
             mode='lines+markers+text',
             name=m,
-            line=dict(color=c, width=5),  # Thicker line
+            line=dict(color=c, width=5, dash='dot'),  # Thicker line
             marker=dict(size=14),  # Larger dots
             text=[f"{subj[i]}%", f"{act[i]}%"],
             textfont=dict(size=14, weight="bold"),  # Larger label text
@@ -166,7 +168,7 @@ with c2:
 
         fig_slope.add_annotation(
             x=0.5, y=mid_y + y_offset,
-            text=f"-{subj[i] - act[i]:.1f}%",
+            text=f"{annotate}\n-{subj[i] - act[i]:.1f}%",
             showarrow=False,
             font=dict(color='#666666', size=14, weight="bold"),  # Larger Annotation
             bgcolor="white"
@@ -190,20 +192,21 @@ with c3:
     models = ['Sora2', 'Veo3']
     action_scores = [71.8, 64.5]
     audio_scores = [81.7, 77.6]
-
+    i=0
     for i, m in enumerate(models):
         c = COLORS[m]
 
         if i == 0:
             text_pos = ["top center", "top center"]
+            annotate = "Sora2 Gap:"
         else:
             text_pos = ["bottom center", "bottom center"]
-
+            annotate = "Veo3.1 Gap:"
         fig_av_slope.add_trace(go.Scatter(
             x=['Action', 'Audio'], y=[action_scores[i], audio_scores[i]],
             mode='lines+markers+text',
             name=m,
-            line=dict(color=c, width=5),
+            line=dict(color=c, width=5, dash='dot'),
             marker=dict(size=14),
             text=[f"{action_scores[i]}%", f"{audio_scores[i]}%"],
             textfont=dict(size=14, weight="bold"),
@@ -214,7 +217,7 @@ with c3:
         y_offset = 4 if i == 0 else -4
 
         diff = audio_scores[i] - action_scores[i]
-        diff_text = f"+{diff:.1f}%"
+        diff_text = f"{annotate}\n+{diff:.1f}%"
 
         fig_av_slope.add_annotation(
             x=0.5, y=mid_y + y_offset,
