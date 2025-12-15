@@ -235,3 +235,110 @@ with c3:
         height=400
     )
     st.plotly_chart(fig_av_slope, use_container_width=True)
+
+st.divider()
+
+st.subheader("🔎 Deep Dive: Category Failure Modes")
+st.caption("Which specific question type fails within each prompt category?")
+
+# Data Setup
+labels_y = ['Biological', 'Physical', 'Social', 'Temporal']
+labels_x = ['Subject', 'Environment', 'Action', 'Audio']
+
+# Sora Data (From your output)
+z_sora = [
+    [89.4, 93.0, 57.9, 62.0],  # Bio
+    [100.0, 87.5, 74.1, 100.0],  # Phy
+    [95.4, 98.9, 96.7, 96.9],  # Soc
+    [91.4, 93.3, 58.5, 68.2]  # Tem
+]
+
+# Veo Data (From your output)
+z_veo = [
+    [89.4, 93.0, 54.7, 57.7],  # Bio
+    [94.2, 92.3, 74.1, 89.7],  # Phy
+    [95.2, 96.8, 92.4, 95.9],  # Soc
+    [91.4, 93.3, 37.8, 61.4]  # Tem
+]
+
+h1, h2 = st.columns(2)
+
+with h1:
+    st.markdown("**Sora 2** Breakdown")
+    fig_heat_sora = go.Figure(data=go.Heatmap(
+        z=z_sora, x=labels_x, y=labels_y,
+        colorscale=[[0, 'white'], [1, COLORS['Sora2']]],  # Custom Brand Gradient
+        text=[[f"{v}%" for v in row] for row in z_sora],
+        texttemplate="%{text}",
+        textfont={"size": 14}
+    ))
+    fig_heat_sora.update_layout(height=400, margin=dict(l=0, r=0, t=0, b=0))
+    st.plotly_chart(fig_heat_sora, use_container_width=True)
+
+with h2:
+    st.markdown("**Veo 3** Breakdown")
+    fig_heat_veo = go.Figure(data=go.Heatmap(
+        z=z_veo, x=labels_x, y=labels_y,
+        colorscale=[[0, 'white'], [1, COLORS['Veo3']]],  # Custom Brand Gradient
+        text=[[f"{v}%" for v in row] for row in z_veo],
+        texttemplate="%{text}",
+        textfont={"size": 14}
+    ))
+    fig_heat_veo.update_layout(height=400, margin=dict(l=0, r=0, t=0, b=0))
+    st.plotly_chart(fig_heat_veo, use_container_width=True)
+
+st.divider()
+
+# --- ROW 4: DEEP DIVE HISTOGRAMS ---
+st.subheader("📊 Category Failure Modes (Detailed View)")
+st.caption("Comparing Subject, Environment, Action, and Audio performance within each category.")
+
+# Helper to create charts
+q_types = ['Subject', 'Environment', 'Action', 'Audio']
+
+
+def create_grouped_bar(title, sora_vals, veo_vals):
+    df = pd.DataFrame({
+        'Question Type': q_types * 2,
+        'Score': sora_vals + veo_vals,
+        'Model': ['Sora2'] * 4 + ['Veo3'] * 4
+    })
+
+    fig = px.bar(
+        df, x='Question Type', y='Score', color='Model',
+        barmode='group', color_discrete_map=COLORS, text_auto='.1f',
+        title=title
+    )
+    fig.update_layout(
+        yaxis_range=[0, 115],
+        margin=dict(l=10, r=10, t=40, b=10),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=350,
+        font=dict(size=12),
+        title_font_size=16
+    )
+    fig.update_traces(textfont_size=12, textposition="outside", cliponaxis=False)
+    return fig
+
+
+# Data extraction for histograms
+data_bio_sora = z_sora[0]
+data_phy_sora = z_sora[1]
+data_soc_sora = z_sora[2]
+data_tem_sora = z_sora[3]
+
+data_bio_veo = z_veo[0]
+data_phy_veo = z_veo[1]
+data_soc_veo = z_veo[2]
+data_tem_veo = z_veo[3]
+
+r4_col1, r4_col2 = st.columns(2)
+
+with r4_col1:
+    st.plotly_chart(create_grouped_bar("Biological Implausibility", data_bio_sora, data_bio_veo),
+                    use_container_width=True)
+    st.plotly_chart(create_grouped_bar("Social Inversion", data_soc_sora, data_soc_veo), use_container_width=True)
+
+with r4_col2:
+    st.plotly_chart(create_grouped_bar("Physical Incongruity", data_phy_sora, data_phy_veo), use_container_width=True)
+    st.plotly_chart(create_grouped_bar("Temporal Modification", data_tem_sora, data_tem_veo), use_container_width=True)
