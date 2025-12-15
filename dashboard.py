@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="T2V Evaluation",
+    page_title="Human Centered Framwork for T2V Evaluation",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -51,8 +51,10 @@ df_radar = pd.DataFrame({
 })
 
 # --- TITLE SECTION ---
-st.title("🎬 T2V Model Evaluation: Unconventional Prompts")
-st.markdown("##### Forensic analysis of **Sora2** vs **Veo3** across adversarial categories.")
+st.title("🎬 T2V Model Evaluation on Off-Manifold Prompts")
+st.markdown("##### Analysis of **Sora2** vs **Veo3** across 4 prompt categories each containing 25 human filtered off-manifold prompts. \n##### A total of 100 videos per model assessed.")
+st.markdown("##### The prompt categories were as follows: \n###### 1. Biological Implausability (e.g.: a cat barking, a butterly spinning a web.) \n###### 2. Physical Improbability (e.g.: a cotton ball smashing through a steel armour plate.) \n###### 3. Temporal Modification (prompts that alter the linear flow of time.) \n###### 4. Social Inversion (e.g.: homeowners welcoming theives, toddlers instructing parents)")
+st.markdown("##### Each prompt and corresponding video was analysed by a human across 4 question categories: \n###### 1.Subject Consistency \n###### 2. Action Consistency \n###### 3. Environmental Consistency \n###### 4. Audio Consistency (new)")
 st.divider()
 
 # --- ROW 1: HEADLINE METRICS & CATEGORY BREAKDOWN ---
@@ -135,7 +137,7 @@ with c1:
 
 with c2:
     st.subheader("📉 Prior Bias (Object vs Action)")
-    st.caption("Drop-off from generating the *Subject* to making it perform the *Action*.")
+    st.caption("Drop-off caused by generation of correct subject but not being ablet to make it perform an action.")
 
     fig_slope = go.Figure()
 
@@ -154,10 +156,9 @@ with c2:
             annotate = "Veo3.1 Gap:"
         fig_slope.add_trace(go.Scatter(
             x=['Subject', 'Action'], y=[subj[i], act[i]],
-            mode='lines+markers+text',
+            mode='markers+text',
             name=m,
-            line=dict(color=c, width=5, dash='dot'),  # Thicker line
-            marker=dict(size=14),  # Larger dots
+            marker=dict(size=14,color = c),  # Larger dots
             text=[f"{subj[i]}%", f"{act[i]}%"],
             textfont=dict(size=14, weight="bold"),  # Larger label text
             textposition=text_pos
@@ -170,7 +171,7 @@ with c2:
             x=0.5, y=mid_y + y_offset,
             text=f"{annotate}\n-{subj[i] - act[i]:.1f}%",
             showarrow=False,
-            font=dict(color='#666666', size=14, weight="bold"),  # Larger Annotation
+            font=dict(color=c, size=14, weight="bold"),  # Larger Annotation
             bgcolor="white"
         )
 
@@ -204,10 +205,9 @@ with c3:
             annotate = "Veo3.1 Gap:"
         fig_av_slope.add_trace(go.Scatter(
             x=['Action', 'Audio'], y=[action_scores[i], audio_scores[i]],
-            mode='lines+markers+text',
+            mode='markers+text',
             name=m,
-            line=dict(color=c, width=5, dash='dot'),
-            marker=dict(size=14),
+            marker=dict(size=14,color=c),
             text=[f"{action_scores[i]}%", f"{audio_scores[i]}%"],
             textfont=dict(size=14, weight="bold"),
             textposition=text_pos
@@ -223,7 +223,7 @@ with c3:
             x=0.5, y=mid_y + y_offset,
             text=diff_text,
             showarrow=False,
-            font=dict(color='#666666', size=14, weight="bold"),
+            font=dict(color=c, size=14, weight="bold"),
             bgcolor="white"
         )
 
